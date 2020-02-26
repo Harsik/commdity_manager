@@ -1,0 +1,315 @@
+<!----------------------------------------------------------
+ FileName		: adminPurchaseListFM.html
+ Description		: 매입 리스트
+ LastModifyDate	: 2020. 2. 14.
+ LastModifier	: 홍성관
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 14.    홍성관    1.0    최초생성
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 매출관리</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+      <span>product manager List</span>
+    </a>
+    <div class="collapse navbar-collapse" style="flex-grow: 0;">
+      <ul class="navbar-nav">
+        <li><a th:href="@{/admin/login}">관리자 페이지 로그인</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="both-pd">
+    <form id="searchForm" name="searchForm" th:action="@{/admin/purchaseList/1}" method="post"
+          th:object="${purchaseRequest}">
+      <input type="hidden" name="page" th:value="${purchaseList.number + 1}">
+      <div class="container search">
+        <div>
+          <span>작성일 기준</span>
+          <span><input type="date" name="fromRegDt" th:value="*{fromRegDt}"></span>
+          <span> - </span>
+          <span><input type="date" name="toRegDt" th:value="*{toRegDt}"></span>
+          <span>발급일 기준</span>
+          <span><input type="date" name="fromIssueDt" th:value="*{fromIssueDt}"></span>
+          <span> - </span>
+          <span><input type="date" name="toIssueDt" th:value="*{toIssueDt}"></span>
+        </div>
+        <div>
+          <span>상호명</span>
+          <span><input type="text" name="companyNM" placeholder="반출자 명" th:value="*{companyNM}"></span>
+          <span>지급 여부</span>
+          <span><select name="paymentYN" th:value="*{paymentYN}"
+                        th:selected="*{paymentYN}">
+                <option th:value="All">전체</option>
+                <option th:value="Y">지급</option>
+                <option th:value="N">미지급</option>
+              </select></span>
+        </div>
+        <div>
+          <button type="submit" class="reg_button color_blue">검색</button>
+          <button class="reg_button color_red" th:onclick="fncResetSearch();">초기화</button>
+        </div>
+      </div>
+    </form>
+  </header>
+
+  <div class="container list-box avccd">
+    <div style="float: right" th:if="${totals != null}" th:object="${totals}">
+      <label>
+        총 : [[*{count}]] 건
+        , 합계금액 : [[*{#numbers.formatInteger(totalPrice,3,'COMMA')}]] 원
+        , 공급가액 : [[*{#numbers.formatInteger(supplyPrice,3,'COMMA')}]] 원
+        , 세액 : [[*{#numbers.formatInteger(taxAmount,3,'COMMA')}]] 원
+      </label>
+      <button class="reg_button color_blue" th:onclick="fncExcelDown()">
+        엑셀 다운로드
+      </button>
+      <div class="reg_button color_blue">
+        <form enctype="multipart/form-data" th:action="@{/admin/purchaseList/readExcel}" method="post">
+          <label for="ex_file">엑셀 업로드</label>
+          <input id="ex_file" name="file" type="file" style="display: none" onchange="this.form.submit()">
+        </form>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>작성일</td>
+            <td>발급일</td>
+            <td>승인번호</td>
+            <td style="display:none">전송일자</td>
+            <td>사업자등록번호</td>
+            <td style="display:none">종사업장번호</td>
+            <td style="display:none">대표자명</td>
+            <td style="display:none">주소</td>
+            <td style="display:none">공급받는자사업자등록번호</td>
+            <td style="display:none">종사업장번호</td>
+            <td>상호</td>
+            <td style="display:none">대표자명</td>
+            <td style="display:none">주소</td>
+            <td>합계금액</td>
+            <td>공급가액</td>
+            <td>세액</td>
+            <td style="display:none">전자세금계산서분류</td>
+            <td style="display:none">전자세금계산서종류</td>
+            <td style="display:none">발급유형</td>
+            <td style="display:none">비고</td>
+            <td style="display:none">영수/청구 구분</td>
+            <td style="display:none">공급자 이메일</td>
+            <td style="display:none">공급받는자 이메일1</td>
+            <td style="display:none">공급받는자 이메일2</td>
+            <td style="display:none">품목일자</td>
+            <td>품목명</td>
+            <td style="display:none">품목규격</td>
+            <td style="display:none">품목수량</td>
+            <td style="display:none">품목단가</td>
+            <td style="display:none">품목공급가액</td>
+            <td style="display:none">품목세액</td>
+            <td>품목비교</td>
+            <td style="display:none">수금여부</td>
+            <td style="display:none">수금일자</td>
+            <td style="display:none">지급일</td>
+            <td style="display:none">비고</td>
+            <td style="display:none">매출/매입 구분</td>
+          </tr>
+          </thead>
+          <th:block th:if="${purchaseList != null}">
+            <tbody th:if="${!purchaseList.isEmpty()}">
+            <tr th:each="map : ${purchaseList.content}">
+              <td th:text="${map.regDt}"></td><!--작성일-->
+              <td th:text="${map.issueDt}"></td><!--발급일-->
+              <td><a th:onclick="fncPaymentModalPopup([[${map.approveNum}]])" th:text="${map.approveNum}"
+                     style="cursor:pointer;"></a></td><!--승인번호-->
+              <td style="display:none" th:text="${map.sendDt}"></td>
+              <td th:text="${map.businessNum}"></td><!--사업자등록번호-->
+              <td style="display:none" th:text="${map.subBusinessNum}"></td>
+              <td th:text="${map.companyNM}"></td><!--상호-->
+              <td style="display:none" th:text="${map.ceoName}"></td>
+              <td style="display:none" th:text="${map.address}"></td>
+              <td style="display:none" th:text="${map.recipientBusinessNum}"></td>
+              <td style="display:none" th:text="${map.recipientSubBusinessNum}"></td>
+              <td style="display:none" th:text="${map.recipientCompanyNM}"></td>
+              <td style="display:none" th:text="${map.recipientCeoNM}"></td>
+              <td style="display:none" th:text="${map.recipientAddress}"></td>
+              <td th:text="${map.totalPrice}"></td><!--합계금액-->
+              <td th:text="${map.supplyPrice}"></td><!--공급가액-->
+              <td th:text="${map.taxAmount}"></td><!--세액-->
+              <td style="display:none" th:text="${map.invoiceClassify}"></td>
+              <td style="display:none" th:text="${map.invoiceType}"></td>
+              <td style="display:none" th:text="${map.issueType}"></td>
+              <td style="display:none" th:text="${map.priceNote}"></td>
+              <td style="display:none" th:text="${map.classfication}"></td>
+              <td style="display:none" th:text="${map.recipientEmail1}"></td>
+              <td style="display:none" th:text="${map.recipientEmail2}"></td>
+              <td style="display:none" th:text="${map.itemDT}"></td>
+              <td th:text="${map.itemNM}"></td><!--품목명-->
+              <td style="display:none" th:text="${map.itemSpec}"></td>
+              <td style="display:none" th:text="${map.itemQuantity}"></td>
+              <td style="display:none" th:text="${map.itemUnitPrice}"></td>
+              <td style="display:none" th:text="${map.itemSupplyPrice}"></td>
+              <td style="display:none" th:text="${map.itemTaxPrice}"></td>
+              <td th:text="${map.itemNote}"></td><!--품목비교-->
+              <td style="display:none" th:text="${map.collectionMoneyYN}"></td>
+              <td style="display:none" th:text="${map.collectionMoneyDt}"></td>
+              <td style="display:none" th:text="${map.paymentYN}"></td>
+              <td style="display:none" th:text="${map.paymentDt}"></td>
+              <td style="display:none" th:text="${map.note}"></td>
+              <td style="display:none" th:text="${map.salePurchaseClassification}"></td>
+            </tr>
+            </tbody>
+          </th:block>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- customers pagination -->
+<!--<div class="container text-center">-->
+<th:block th:if="${purchaseList != null}">
+  <div aria-label="Pagination" th:if="${purchaseList.totalPages gt 0}" th:object="${purchaseRequest}">
+    <ul style="text-align:center;">
+      <li style="display:inline" th:if="${purchaseList.number ne 0}"
+          th:classappend="${purchaseList.number eq 0} ? 'disabled'">
+        <a style="cursor:pointer" th:onclick="fncSumitForm([[1]])" aria-label="Previous" title="First Page"
+           data-toggle="tooltip">
+          <span aria-hidden="true">◀</span>
+        </a>
+      </li>
+      <li style="display:inline" th:if="${purchaseList.number ne 0}"
+          th:classappend="${purchaseList.number eq 0} ? 'disabled'">
+        <a style="cursor:pointer" th:onclick="fncSumitForm([[${purchaseList.number}]])" aria-label="Previous"
+           title="Previous Page" data-toggle="tooltip">
+          <span aria-hidden="true">◁</span>
+        </a>
+      </li>
+      <li style="display:inline" th:classappend="${i eq purchaseList.number + 1} ? 'active'"
+          th:each="i : ${#numbers.sequence( purchaseList.number - 3 lt 1 ? 1 : purchaseList.number - 3, purchaseList.number + 5 gt purchaseList.totalPages ? purchaseList.totalPages : purchaseList.number + 5, 1)}">
+        <a style="cursor:pointer" th:onclick="fncSumitForm([[${i}]])" class="page-link" th:text="[+${i}+]"
+           th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+      </li>
+      <li style="display:inline" th:if="${purchaseList.number + 1 ne purchaseList.totalPages}"
+          th:classappend="${purchaseList.number + 1 eq purchaseList.totalPages} ? 'disabled'">
+        <a style="cursor:pointer" th:onclick="fncSumitForm([[${purchaseList.number + 2}]])" aria-label="Next"
+           title="Next Page" data-toggle="tooltip">
+          <span aria-hidden="true">▷</span>
+        </a>
+      </li>
+      <li style="display:inline" th:if="${purchaseList.number + 1 ne purchaseList.totalPages}"
+          th:classappend="${purchaseList.number + 1 eq purchaseList.totalPages} ? 'disabled'">
+        <a style="cursor:pointer" th:onclick="fncSumitForm([[${purchaseList.totalPages}]])" aria-label="Next"
+           title="Last Page" data-toggle="tooltip">
+          <span aria-hidden="true">▶</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</th:block>
+
+<!-- The paymentModal -->
+<div id="paymentModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <table>
+      <tbody>
+      <tr>
+        <td>지급여부</td>
+        <td><select>
+          <option th:value="Y">수금</option>
+          <option th:value="N">미수금</option>
+        </select></td>
+      </tr>
+      <tr>
+        <td>지급일</td>
+        <td><input type="date"></td>
+      </tr>
+      <tr style="display: none">
+        <td><input></td>
+      </tr>
+      </tbody>
+    </table>
+    <button onclick="fncPaymentUpdate()">등록 및 수정</button>
+    <button onClick="fncPaymentModalClose()">닫기</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/admin/adminPurchaseListFM.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

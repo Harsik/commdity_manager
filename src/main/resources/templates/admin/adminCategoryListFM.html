@@ -1,0 +1,243 @@
+<!----------------------------------------------------------
+ FileName		: adminCategoryListFM.html
+ Description		: 카테고리 리스트 및 등록
+ LastModifyDate	: 2020. 2. 14.
+ LastModifier	: 홍성관
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 14.    홍성관    1.0    최초생성
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 카테고리 리스트 및 등록</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link"><b>카테고리 관리</b></a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a th:href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="both-pd">
+    <div class="container search">
+      <div class="dis-flex">
+        제조사 카테고리 등록
+        <label class="mr-auto ml15">
+          <input type="text" placeholder="ex: 한성, 삼성...">
+        </label>
+        <label>
+          <input type="button" onclick="fncMainCategoryReg(this)" value="제품 등록">
+          <input type="button" onclick="fncCompanyRegistModifyModalPopup()" value="수정">
+        </label>
+      </div>
+      <div class="dis-flex mt20">
+        제품명 카테고리 등록
+        <label class="mr-auto ml15">
+          <select class="select_view">
+            <option th:each="cateMain : ${cateMainList}" th:value="${cateMain}" th:text="${cateMain}">
+          </select>
+
+          <input type="text" placeholder="ex: 모니터, 공유기, 노트북...">
+        </label>
+        <label>
+          <input type="button" onclick="fncItemCategoryReg(this)" value="품목 등록">
+          <input type="button" onclick="fncItemRegistModifyModalPopup()" value="수정">
+        </label>
+      </div>
+      <div class="dis-flex mt20">
+        모델명 카테고리 등록
+        <label class="mr-auto ml15">
+          <select id="selectModelRegistCompanyName" class="select_view">
+            <option th:each="cateMain : ${cateMainList}" th:value="${cateMain}" th:text="${cateMain}">
+          </select>
+          <select id="selectModelRegistItemName" class="select_view">
+            <option>모니터</option>
+            <option>노트북</option>
+          </select>
+          <input type="text" placeholder="ex: Dell-Model-ABCD-C8">
+        </label>
+        <label>
+          <input type="button" onclick="fncModelCategoryReg(this)" value="모델명 등록">
+          <input type="button" onclick="fncModelRegistModifyModalPopup()" value="수정">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <div class="container list-box">
+    <a th:if="${isAll}" th:href="@{'/admin/cateList/1?isAll=false'}" style="float:right">
+      <input type="button" value="일반보기"></a>
+    <a th:unless="${isAll}" th:href="@{'/admin/cateList/1?isAll=true'}" style="float:right">
+      <input type="button" value="전체보기"></a>
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="15%"/>
+            <col width="12.5%"/>
+            <col width="20%"/>
+            <col width="*%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>등록일시</td>
+            <td>제조사</td>
+            <td>품목</td>
+            <td>모델명</td>
+            <td>상태</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="map : ${categoryList.content}">
+            <td th:text="${#temporals.format(map.regdt,'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${map.cateCompany}"></td>
+            <td th:text="${map.cateItem}"></td>
+            <td th:text="${map.cateModelName}"></td>
+            <td th:text="${map.cateUse}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- customers pagination -->
+<!--<div class="container text-center">-->
+<div aria-label="Pagination" th:if="${categoryList.totalPages gt 0}">
+  <ul style="text-align:center;">
+    <li style="display:inline" th:if="${categoryList.number ne 0}" th:classappend="${categoryList.number eq 0} ? 'disabled'">
+      <a
+        th:href="@{/admin/cateList/1?isAll={isAll}(page=1, isAll=${isAll})}"
+        aria-label="Previous" title="First Page" data-toggle="tooltip">
+        <span aria-hidden="true">◀</span>
+      </a>
+    </li>
+    <li style="display:inline" th:if="${categoryList.number ne 0}" th:classappend="${categoryList.number eq 0} ? 'disabled'">
+      <a
+        th:href="@{/admin/cateList/{page}?isAll={isAll}(page=${categoryList.number lt 2 ? 1 : categoryList.number},isAll=${isAll})}"
+        aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+        <span aria-hidden="true">◁</span>
+      </a>
+    </li>
+    <li style="display:inline" th:classappend="${i eq categoryList.number + 1} ? 'active'"
+        th:each="i : ${#numbers.sequence( categoryList.number - 3 lt 1 ? 1 : categoryList.number - 3, categoryList.number + 5 gt categoryList.totalPages ? categoryList.totalPages : categoryList.number + 5, 1)}">
+      <a class="page-link" th:href="@{/admin/cateList/{page}?isAll={isAll}(page=${i},isAll=${isAll})}" th:text="[+${i}+]"
+         th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+    </li>
+    <li style="display:inline" th:if="${categoryList.number + 1 ne categoryList.totalPages}" th:classappend="${categoryList.number + 1 eq categoryList.totalPages} ? 'disabled'">
+      <a
+        th:href="@{/admin/cateList/{page}?isAll={isAll}(page=${categoryList.number + 2},isAll=${isAll})}"
+        aria-label="Next" title="Next Page" data-toggle="tooltip">
+        <span aria-hidden="true">▷</span>
+      </a>
+    </li>
+    <li style="display:inline" th:if="${categoryList.number + 1 ne categoryList.totalPages}" th:classappend="${categoryList.number + 1 eq categoryList.totalPages} ? 'disabled'">
+      <a
+        th:href="@{/admin/cateList/{page}?isAll={isAll}(page=${categoryList.totalPages},isAll=${isAll})}"
+        aria-label="Next" title="Last Page" data-toggle="tooltip">
+        <span aria-hidden="true">▶</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- The modifyModal -->
+<div id="modifyModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <table>
+      <tr>
+
+      </tr>
+    </table>
+    <button onClick="fncModifyModalClose()">닫기</button>
+  </div>
+</div>
+
+<!-- The detailModal -->
+<div id="detailModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="fncDetailModalClose()">&times;</span>
+    <ui>
+
+    </ui>
+  </div>
+</div>
+
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
+window.ga = function () {
+  ga.q.push(arguments)
+};
+ga.q = [];
+ga.l = +new Date;
+ga('create', 'UA-XXXXX-Y', 'auto');
+ga('set', 'transport', 'beacon');
+ga('send', 'pageview')
+</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/admin/adminCategoryListFM.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

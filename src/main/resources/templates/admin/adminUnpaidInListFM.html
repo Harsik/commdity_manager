@@ -1,0 +1,211 @@
+<!----------------------------------------------------------
+ FileName		: adminUnpaidInListFM.html
+ Description		: 월별 미지급 현황
+ LastModifyDate	: 2020. 2. 25.
+ LastModifier	: 홍성관
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 25.    홍성관    1.0    최초생성
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>매출관리 - 월별 미지급 현황</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+      <span>product manager List</span>
+    </a>
+    <div class="collapse navbar-collapse" style="flex-grow: 0;">
+      <ul class="navbar-nav">
+        <li><a th:href="@{/admin/login}">관리자 페이지 로그인</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container list-box avccd">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="1%"/>
+            <col width="15%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+            <col width="5%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td rowspan="2" colspan="2">구분</td>
+            <td colspan="4">기지금(A)</td>
+            <td colspan="4">미지금(B)</td>
+            <td rowspan="2">합계(C=A+B)</td>
+          </tr>
+          <tr>
+            <td>건수</td>
+            <td>공급가액</td>
+            <td>VAT</td>
+            <td>합계</td>
+            <td>건수</td>
+            <td>공급가액</td>
+            <td>VAT</td>
+            <td>합계</td>
+          </tr>
+          </thead>
+          <tbody th:if="${!unpaidInList.isEmpty()}" th:each="map, status : ${unpaidInList}" th:switch="${status.index}">
+            <tr th:case="0">
+              <td colspan="2">전년도 누계</td>
+              <td th:text="${map.recInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${map.accInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+              <td
+                th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount + map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+            </tr>
+            <tr th:case="1">
+              <td rowspan="12"></td>
+              <td>1월</td>
+              <td th:text="${map.recInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${map.accInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+              <td
+                th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount + map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+            </tr>
+            <tr th:case="13">
+              <td colspan="2" th:text="${pathYear}+'년 계'"></td>
+              <td th:text="${map.recInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${map.accInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+              <td
+                th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount + map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+            </tr>
+            <tr th:case="14">
+              <td colspan="2" th:text="${pathYear}+'년 누계'"></td>
+              <td th:text="${map.recInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${map.accInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+              <td
+                th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount + map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+            </tr>
+            <tr th:case="*">
+              <td></td>
+              <td th:text="${status.index} + '월'"></td>
+              <td th:text="${map.recInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${map.accInCount}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInTaxAmount,3,'COMMA')}"></td>
+              <td th:text="${#numbers.formatInteger(map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+              <td
+                th:text="${#numbers.formatInteger(map.recInSupplyPrice + map.recInTaxAmount + map.accInSupplyPrice + map.accInTaxAmount,3,'COMMA')}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container">
+  <div class="container ta-right">
+    <form name="searchForm">
+      <input type="hidden" id="searchMoney" name="searchMoney">
+      <select name="searchYear">
+          <option th:each="i : ${#numbers.sequence(thisYear, thisYear - 5, -1)}" th:text="${i}" th:selected="(${i} == ${pathYear})"></option>
+      </select>
+      <input type="button" value="검색" class="reg_button color_blue" onclick="fncSearchUnpaidInList(this)">
+      <input type="button" style="horiz-align: right" value="엑셀 다운로드" class="reg_button color_blue"
+             onClick="fncUnpaidInListExcelDown(this)">
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="/s/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/admin/adminUnpaidInListFM.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

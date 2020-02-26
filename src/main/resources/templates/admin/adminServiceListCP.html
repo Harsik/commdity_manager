@@ -1,0 +1,230 @@
+<!----------------------------------------------------------
+ FileName		: adminServiceListCP.html
+ Description		: 서비스 리스트 조회 및 수정, 삭제
+ LastModifyDate	: 2020. 2. 21.
+ LastModifier	: 류민송
+ LastVersion		: 1.0.2
+ Change History
+     2020. 2. 17.    류민송    1.0    최초생성
+     2020. 2. 18.    류민송    1.0.1  페이징 표시 수정
+     2020. 2. 21.    류민송    1.0.2  네비게이션 수정
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 서비스 리스트 및 수정</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!--  <link rel="manifest" href="site.webmanifest">-->
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+
+        <li class="nav-item">
+          <a href="#" class="nav-link"> <b>서비스 관리</b>
+            <ul>
+              <li class="nav-item"><a th:href="@{'/serviceRegForm'}" class="nav-link">코드 등록</a></li>
+              <li class="nav-item"><a th:href="@{'/serviceList'}" class="nav-link">코드 리스트</a></li>
+            </ul>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a href="#">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container list-box">
+    <a th:if="${isAll}" th:href="@{'/serviceListIndex?isAll=false'}" style="float:right">
+      <input type="button" value="일반보기"></a>
+    <a th:unless="${isAll}" th:href="@{'/serviceListIndex?isAll=true'}" style="float:right">
+      <input type="button" value="전체보기"></a>
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="10%"/>
+            <col width="12.5%"/>
+            <col width="15%"/>
+            <col width="*%"/>
+            <col width="20%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>No.</td>
+            <td>등록일</td>
+            <td onclick="fncSaveCateSection()" style="cursor: pointer">구분</td>
+            <td onclick="fncSaveCateNature()" style="cursor: pointer">성격</td>
+            <td onclick="fncSaveCateSubject()" style="cursor: pointer">계정과목</td>
+            <td onclick="fncSaveCateCredit()" style="cursor: pointer">지급코드</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="service : ${serviceList}">
+            <td>
+              <span th:text="${service.cateIdx}"></span>
+            </td>
+            <td>
+              <span th:text="${#temporals.format(service.regdt, 'yyyy-MM-dd HH:mm')}"></span>
+            </td>
+            <td>
+              <span th:text="${service.cateSection}"></span>
+            </td>
+            <td>
+              <span th:text="${service.cateNature}"></span>
+            </td>
+            <td>
+              <span th:text="${service.cateSubject}"></span>
+            </td>
+            <td>
+              <span th:text="${service.cateCredit}"></span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="container text-center">
+  <span th:if="${isAll} != true and ${serviceList.totalPages} > 1">
+    <ul
+      th:with="start=${T(Math).floor(serviceList.number/10)*10 + 1}, last=(${start + 9 < serviceList.totalPages ? start + 9 : serviceList.totalPages})">
+    <li>
+      <a th:href="@{/serviceListIndex?isAll=false&page=1}" aria-label="First">
+        <span aria-hidden="true">◀</span>
+      </a>
+    </li>
+    <li>
+      <a th:href="${serviceList.first} ? '#' :@{'/serviceListIndex?isAll=false&page=' + ${serviceList.number}}"
+         aria-label="Previous">
+        <span aria-hidden="true">◁</span>
+      </a>
+    </li>
+    <li th:each="page: ${#numbers.sequence(start, last)}">
+      <a th:text="${nowPage} == ${page} ?  【 + ${page}+ 】 : [ + ${page}+ ]"
+         th:href="@{'/serviceListIndex?isAll=false&page=' + ${page}}"></a>
+    </li>
+    <li>
+      <a th:href="${serviceList.last} ? '#' : @{'/serviceListIndex?isAll=false&page=' + ${serviceList.number + 2}}"
+         aria-label="Next">
+        <span aria-hidden="true">▷</span>
+      </a>
+    </li>
+    <li>
+      <a th:href="@{'/serviceListIndex?isAll=false&page=' + ${serviceList.totalPages}}" aria-label="Last">
+        <span aria-hidden="true">▶</span>
+      </a>
+    </li>
+  </ul>
+  </span>
+
+  <span th:if="${isAll} and ${serviceList.totalPages} > 1">
+    <ul
+      th:with="start=${T(Math).floor(serviceList.number/10)*10 + 1}, last=(${start + 9 < serviceList.totalPages ? start + 9 : serviceList.totalPages})">
+    <li>
+      <a th:href="@{/serviceListIndex?isAll=true&page=1}" aria-label="First">
+        <span aria-hidden="true">◀</span>
+      </a>
+    </li>
+    <li>
+      <a th:href="${serviceList.first} ? '#' :@{'/serviceListIndex?isAll=true&page=' + ${serviceList.number}}"
+         aria-label="Previous">
+        <span aria-hidden="true">◁</span>
+      </a>
+    </li>
+    <li th:each="page: ${#numbers.sequence(start, last)}">
+      <a th:text="${nowPage} == ${page} ?  【 + ${page}+ 】 : [ + ${page}+ ]"
+         th:href="@{'/serviceListIndex?isAll=true&page=' + ${page}}"></a>
+    </li>
+    <li>
+      <a th:href="${serviceList.last} ? '#' : @{'/serviceListIndex?isAll=true&page=' + ${serviceList.number + 2}}"
+         aria-label="Next">
+        <span aria-hidden="true">▷</span>
+      </a>
+    </li>
+    <li>
+      <a th:href="@{'/serviceListIndex?isAll=true&page=' + ${serviceList.totalPages}}" aria-label="Last">
+        <span aria-hidden="true">▶</span>
+      </a>
+    </li>
+  </ul>
+  </span>
+  <span th:if="${serviceList.totalPages} < 2">
+    <a th:href="@{/serviceList(page=1)}" aria-label="First">
+        <span aria-hidden="true">1</span>
+      </a>
+  </span>
+</div>
+
+<div id="modifyModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <table>
+      <tr>
+
+      </tr>
+    </table>
+    <button onClick="fncModifyModalClose()">닫기</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/Service.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+<!--------------------------------------------------------------
+ FileName       : adminProductRegC.html
+ Description		: 상품 등록 화면
+ LastModifier	  : 강병수
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 20.    강병수    1.0    경로 수정
+     2020. 2. 18.    강병수    1.0    dept 변경(상세보기 수정)
+     2020. 2. 12.    강병수    1.0    주석작성 및 파일명 변경
+--------------------------------------------------------------->
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 상품 등록</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="/img/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link"><b>상품 관리</b></a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a th:href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <form name="productForm" id="productForm">
+
+    <div class="container list-box" id="productRegist" th:if="${services == null}">
+      <div class="row">
+        <div>
+          <table>
+            <colgroup>
+              <col width="25%"/>
+              <col width="*"/>
+            </colgroup>
+            <tbody>
+            <tr>
+              <td>제조사</td>
+              <td class="ta-left">
+                <select class="select_view" id="productCompany" name="productCompany" th:onchange="fncDownLev2();">
+                  <option selected="selected">선택</option>
+                  <option th:each="company : ${comList}" th:value="${company}" th:text="${company}"></option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>품목</td>
+              <td class="ta-left">
+                <select class="select_view" id="productItem" name="productItem" th:onchange="fncDownLev3();">
+                  <option>선택</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>모델명</td>
+              <td class="ta-left">
+                <select class="select_view" id="productModelName" name="productModelName">
+                  <option>선택</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>S/N</td>
+              <td class="ta-left">
+                <label>
+                  <input type="text" placeholder="S/N" class="select_view" id="productSerial" name="productSerial">
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>구입연월</td>
+              <td class="ta-left">
+                <label>
+                  <input type="date" class="select_view" id="productBuyDt" name="productBuyDt">
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>관리번호</td>
+              <td class="ta-left">
+                <label>
+                  <input type="text" placeholder="관리번호" class="select_view" id="productManagerNum"
+                         name="productManagerNum">
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>상태</td>
+              <td class="ta-left">
+                <label>
+                  <input type="radio" id="productUseYN" name="productUseYN" value="Y" checked="checked">사용중
+                  <input type="radio" id="productUseYN" name="productUseYN" value="N">미사용
+                </label>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="container list-box" id="prodductModify" th:if="${services} == 'modify'">
+      <input type="hidden" id="productIdx" name="productIdx" th:value="${proDetail.productIdx}">
+      <div class="row">
+        <div>
+          <table>
+            <colgroup>
+              <col width="25%"/>
+              <col width="*"/>
+            </colgroup>
+            <tbody>
+            <tr>
+              <td>제조사</td>
+              <td class="ta-left">
+                <select class="select_view" id="productCompany" name="productCompany" th:onchange="fncDownLev2();">
+                  <option selected="selected">선택</option>
+                  <option th:each="company : ${comList}" th:value="${company}" th:text="${company}"
+                          th:if="${company == proDetail.productCompany}" th:selected="selected"></option>
+                  <option th:each="company : ${comList}" th:value="${company}" th:text="${company}"
+                          th:unless="${company == proDetail.productCompany}"></option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>품목</td>
+              <td class="ta-left">
+                <select class="select_view" id="productItem" name="productItem" th:onchange="fncDownLev3();">
+                  <option selected="selected">선택</option>
+                  <option th:each="item : ${itemList}" th:value="${item}" th:text="${item}"
+                          th:if="${item == proDetail.productItem}" th:selected="selected"></option>
+                  <option th:each="item : ${itemList}" th:value="${item}" th:text="${item}"
+                          th:unless="${item == proDetail.productItem}"></option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>모델명</td>
+              <td class="ta-left">
+                <select class="select_view" id="productModelName" name="productModelName">
+                  <option>선택</option>
+                  <option th:each="modelNm : ${modelList}" th:value="${modelNm}" th:text="${modelNm}"
+                          th:if="${modelNm == proDetail.productModelName}" th:selected="selected"></option>
+                  <option th:each="modelNm : ${modelList}" th:value="${modelNm}" th:text="${modelNm}"
+                          th:unless="${modelNm == proDetail.productModelName}"></option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>S/N</td>
+              <td class="ta-left">
+                <input type="text" placeholder="S/N" class="select_view" id="productSerial" name="productSerial"
+                       th:value="${proDetail.productSerial}">
+              </td>
+            </tr>
+            <tr>
+              <td>구입연월</td>
+              <td class="ta-left">
+                <input type="date" class="select_view" id="productBuyDt" name="productBuyDt"
+                       th:value="${proDetail.productBuyDt}">
+              </td>
+            </tr>
+            <tr>
+              <td>관리번호</td>
+              <td class="ta-left">
+                <input type="text" class="select_view" id="productManagerNum" name="productManagerNum"
+                       th:if="${proDetail.productManagerNum != null}" th:value="${proDetail.productManagerNum}">
+              </td>
+            </tr>
+            <tr>
+              <td>상태</td>
+              <td class="ta-left">
+                <label>
+                  <th:block th:if="${proDetail.productUseYN == 'Y'}">
+                    <input type="radio" id="productUseYN" name="productUseYN" value="Y" th:text="사용중"
+                           th:checked="checked">
+                    <input type="radio" id="productUseYN" name="productUseYN" value="N" th:text="미사용">
+                  </th:block>
+                  <th:block th:unless="${proDetail.productUseYN == 'Y'}">
+                    <input type="radio" id="productUseYN" name="productUseYN" value="Y" th:text="사용중">
+                    <input type="radio" id="productUseYN" name="productUseYN" value="N" th:text="미사용"
+                           th:checked="checked">
+                  </th:block>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>등록일시</td>
+              <td class="ta-left" th:text="${#temporals.format(proDetail.regdt,'yyyy-MM-dd HH:mm')}"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+</main>
+
+<div class="container ta-right" id="btnList">
+  <input type="button" class="reg_button color_blue" value="목록" th:onClick="location.href='/admin/productList'">
+  <input type="button" class="reg_button color_blue" value="등록" th:if="${services} == null"
+         th:onclick="fncRegProduct();">
+  <input type="button" class="reg_button color_red" value="취소" th:if="${services} == null"
+         th:onClick="location.href='/admin/productList'">
+  <input type="button" class="reg_button color_blue" value="수정" th:if="${services} == 'modify'"
+         th:onclick="fncUpdateProduct();">
+  <input type="button" class="reg_button color_red" value="취소" th:if="${services} == 'null'"
+         th:onclick="fncCancel();">
+  <input type="button" class="reg_button color_red" value="삭제" th:if="${services} == 'modify'"
+         th:onclick="fncDelProduct();">
+</div>
+</form>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>
+      해당 부분 상세 내용 나와야 함
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/Product.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!----------------------------------------------------------
+ FileName		: adminUserDetailCM.html
+ Description		: 유저 정보 조회
+ LastModifyDate	: 2020. 2. 17.
+ LastModifier	: 류민송
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 17.    류민송    1.0    최초생성
+     2020. 2. 18.    류민송    1.1    조회 및 수정 페이지 통합
+     2020. 2. 20.    류민송    1.1.1  admin 경로 수정
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 유저 정보 조회 및 수정</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <link rel="icon" href="../favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link"><b>유저 관리</b></a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a th:href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <form id="regForm" method="post" action="/admin/userWrite">
+    <div class="container list-box">
+      <div class="row">
+        <div>
+          <table>
+            <colgroup>
+              <col width="25%"/>
+              <col width="*"/>
+            </colgroup>
+            <tbody>
+            <tr>
+              <td>사용자 번호</td>
+              <td class="ta-left">
+                <label>
+                  <input type="hidden" th:name="userIdx" th:value="${userinfoDto.userIdx}"/>
+                  <span id="userIdx" th:text="${userinfoDto.userIdx}"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>이름</td>
+              <td class="ta-left">
+                <label>
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input id="userName" type="text" class="select_view" name="userName" th:value="${userinfoDto.userName}" required>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>직급</td>
+              <td class="ta-left">
+                <select id="userPosition" class="select_view" name="userPosition">
+                  <option th:selected="${userinfoDto.userPosition} == '사원'" value="사원">사원</option>
+                  <option th:selected="${userinfoDto.userPosition} == '주임'" value="주임">주임</option>
+                  <option th:selected="${userinfoDto.userPosition} == '과장'" value="과장">과장</option>
+                  <option th:selected="${userinfoDto.userPosition} == '차장'" value="차장">차장</option>
+                  <option th:selected="${userinfoDto.userPosition} == '부장'" value="부장">부장</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>입사일</td>
+              <td class="ta-left">
+                <label>
+                  <span th:text="${userinfoDto.userRegdt}"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>사용 여부</td>
+              <td class="ta-left">
+                <label>
+                  <select id="userUseYN" class="select_view" name="userUseYN">
+                    <option th:selected="${userinfoDto.userUseYN} == 1" value="1">사용 중</option>
+                    <option th:selected="${userinfoDto.userUseYN} == 0" value="0">사용 중 아님</option>
+                  </select>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>등록일시</td>
+              <td class="ta-left">
+                <label>
+                  <span th:text="${#temporals.format(userinfoDto.regdt, 'yyyy-MM-dd HH:mm')}"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>수정일시</td>
+              <td class="ta-left">
+                <label>
+                  <span th:text="${#temporals.format(userinfoDto.chgdt, 'yyyy-MM-dd HH:mm')}"></span>
+                </label>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+        <div class="container ta-right">
+          <input id="refererBtn" type="button" value="목록으로" class="reg_button color_blue">
+          <input id="updateBtn" type="submit" value="수정" class="reg_button color_blue">
+          <input id="deleteBtn" type="button" value="삭제" class="reg_button color_red">
+        </div>
+  </form>
+</main>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/Userinfo.js"></script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

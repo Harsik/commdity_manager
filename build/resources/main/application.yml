@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://10.0.0.11:3306/item_manager?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: dkzlqmthvmxm
+
+  jpa:
+      database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+      open-in-view: false
+      show-sql: true
+      hibernate:
+          show_sql: true
+          format_sql: true
+          ddl-auto: update
+  devtools:
+    livereload:
+      enabled: true
+    freemarker:
+      cache: false
+
+logging:
+    level:
+        org:
+            hibernate:
+                SQL: DEBUG
+                type:
+                    descriptor:
+                        sql:
+                            BasicBinder: TRACE

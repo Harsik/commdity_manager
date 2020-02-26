@@ -1,0 +1,196 @@
+<!----------------------------------------------------------
+ FileName		: index.html
+ Description		: 게시판 리스트 및 검색
+ LastModifyDate	: 2020.02.17
+ LastModifier	: 김주찬
+ LastVersion		: 1.0
+ Change History
+     2020.02.17.김주찬 1.0 최초생성
+ 수정 내용 : View단 페이징 처리 수정
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 출고 상태 리스트</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link"><b>출고 관리</b></a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a th:href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container list-box">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="7.5%"/>
+            <col width="10%"/>
+            <col width="7.5%"/>
+            <col width="10%"/>
+            <col width="*"/>
+            <col width="15%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>No.</td>
+            <td>반출일</td>
+            <td>사용자</td>
+            <td>반입예정일</td>
+            <td>제품명</td>
+            <!--<td>상태</td>-->
+            <td>위치</td>
+            <td>반출여부</td>
+          </tr>
+          </thead>
+          <tbody>
+          <form name="testFrom" id="testForm">
+            <tr th:each="board : ${boardList}">
+              <td th:text="${board.boardIdx}"></td>
+              <td th:text="${board.boardCarryoutDt}"></td>
+              <td th:text="${board.userinfoEntity.getUserName()}"></td>
+              <td th:text="${board.boardCarryinDt}"></td>
+              <td><a th:text="${board.productEntity.getProductItem()}"
+                     th:href="@{'/getBoardDetail/' + ${board.boardIdx}}"></a></td>
+              <!--<td th:text="${board.boardCarryYN}"></td>-->
+              <td th:text="${board.boardUsePlace}"></td>
+              <td th:text="${board.boardCarryYN}"></td>
+            </tr>
+          </form>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container ta-right">
+  <input type="button" value="등록" class="reg_button color_blue" th:onClick="location.href='/admin/getBoardRegList'">
+</div>
+
+<div class="container text-center">
+  <!--  <th:block th:if="${totPage != 0}" th:each="num : ${#numbers.sequence(1,totPage)}">-->
+  <!--    <a th:if="${num == 1 && nowPage != 1}" th:href="@{/boardList(page=1)}" th:text="'◀'"></a>-->
+  <!--    <a th:if="${num == 1 && nowPage != 1}" th:href="@{/boardList(page=${nowPage-1})}" th:text="'◁'"></a>-->
+  <!--    <a th:if="${nowPage != num}" th:href="@{/boardList(page=${num})}" th:text="'['+${num}+']'"></a>-->
+  <!--    <a th:if="${nowPage == num}" th:text="'【'+${num}+'】'"></a>-->
+  <!--    <a th:if="${num == totPage && nowPage != totPage}" th:href="@{/boardList(page=${nowPage+1})}" th:text="'▷'"></a>-->
+  <!--    <a th:if="${num == totPage && nowPage != totPage}" th:href="@{/boardList(page=${totPage})}" th:text="'▶'"></a>-->
+  <!--  </th:block>-->
+  <span th:if="${boardList.totalPages} > 1">
+    <ul
+      th:with="start=${T(Math).floor(boardList.number/10)*10 + 1}, last=(${start + 9 < boardList.totalPages ? start + 9 : boardList.totalPages})">
+    <li>
+      <a th:if="${boardList.number+1 != 1}" th:href="@{/admin/boardList(page=1)}" aria-label="First">
+        <span aria-hidden="true">◀</span>
+      </a>
+    </li>
+    <li>
+      <a th:if="${boardList.number+1 != 1}" th:href="${boardList.first} ? '#' :@{/admin/boardList(page=${boardList.number})}" aria-label="Previous">
+        <span aria-hidden="true">◁</span>
+      </a>
+    </li>
+    <li th:each="page: ${#numbers.sequence(start, last)}">
+      <a th:text=" ${nowPage} == ${page} ?  【 + ${page}+ 】 : [ + ${page}+ ]"
+         th:href="@{/admin/boardList(page=${page})}"></a>
+    </li>
+    <li>
+      <a th:if="${boardList.number !=boardList.totalPages-1}" th:href="${boardList.last} ? '#' : @{/admin/boardList(page=${boardList.number + 2})}" aria-label="Next">
+        <span aria-hidden="true">▷</span>
+      </a>
+    </li>
+    <li>
+      <a th:if="${boardList.number !=boardList.totalPages-1}" th:href="@{/admin/boardList(page=${boardList.totalPages})}" aria-label="Last">
+        <span aria-hidden="true">▶</span>
+      </a>
+    </li>
+  </ul>
+  </span>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>
+      해당 부분 상세 내용 나와야 함
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
+

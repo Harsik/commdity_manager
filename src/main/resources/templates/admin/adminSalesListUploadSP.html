@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+<!----------------------------------------------------------------
+ FileName       : purchaseListUploadSP.html
+ Description		: 매출계산서 목록 엑셀파일 업로드 화면
+ LastModifyDate	: 2020. 2. 12.
+ LastModifier	  : 강병수
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 12.    강병수    1.0    주석작성 및 파일명 변경
+     2020. 2. 10.    강병수    1.0    최초생성
+----------------------------------------------------------------->
+<head>
+  <meta charset="utf-8">
+  <title>매출관리 - 매출계산서리스트 엑셀 업로드</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+<form name="excelUploadForm" id="excelUploadForm" enctype="multipart/form-data">
+  <div id="upload" name="upload">
+    <input multiple="multiple" type="file" id="excelfile" name="excelfile">
+    <button class="reg_button color_blue" th:onclick="fncExcelUpload()">업로드</button>
+  </div>
+</form>
+<script src="js/Sales.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+</html>

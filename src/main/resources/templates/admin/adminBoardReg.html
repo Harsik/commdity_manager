@@ -1,0 +1,219 @@
+<!----------------------------------------------------------
+ FileName		: index.html
+ Description		: 게시판 리스트 및 검색
+ LastModifyDate	: 2020.02.17
+ LastModifier	: 김주찬
+ LastVersion		: 1.0
+ Change History
+     2020.02.17.김주찬 1.0 최초생성
+ 수정 내용 : 없음
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 입출고 등록</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!--<link rel="manifest" href="site.webmanifest">-->
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link"><b>출고 관리</b></a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a th:href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="container list-box">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="25%"/>
+            <col width="*"/>
+          </colgroup>
+          <tbody>
+          <tr>
+            <td>상품정보</td>
+            <input type="hidden" name="btnUseYN" id="btnUseYN" th:value="${btnUseYN}">
+            <!--사용자외 현재 사용등록된 상품 Idx List-->
+            <input type="hidden" name="otherProductIdList" id="otherProductIdList" th:value="${otherProductIdList}">
+            <!--현재 사용자 Idx로 등록된 상품 Idx List -->
+            <input type="hidden" id="productIdList" th:value="${productIdList}">
+            <!--현재 세부정보의 사용자 Idx 저장-->
+            <form name="boardUserIdx">
+              <input type="hidden" name="boardUserIdx" th:value="${boardUserIdx}">
+            </form>
+
+            <td class="ta-left" style="height: 300px; overflow-y: scroll; display: block;">
+              <div th:each="product : ${productList}">
+                <input type="checkbox" class="product_chk" name="product_chk" onclick="checkboxBtn();"
+                       th:text="${product.productCompany}+':'+${product.productItem}+':'+${product.productModelName}+':'+${product.productSerial}"
+                       th:value="${product.productIdx}"
+                >
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>사용자</td>
+            <td class="ta-left">
+              <label>
+                <select class="select_view" id="selectbox_chk">
+                  <option class="selector_chk"
+                          th:each="user : ${userInfoList}"
+                          th:text="${user.userName}"
+                          th:value="${user.userIdx}"
+                          th:selected="${user.userIdx} == ${boardUserIdx}">
+                  </option>
+                </select>
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>반출일</td>
+            <td class="ta-left">
+              <label>
+                <input type="date" class="select_view" id="carryoutdt"
+                       th:if="${board.boardCarryoutDt} != null" th:value="${board.boardCarryoutDt}">
+                <input type="date" class="select_view" id="carryoutdt"
+                       th:if="${board.boardCarryoutDt} == null " th:value="${board.boardCarryoutDt}">
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>반입 예정일</td>
+            <td class="ta-left">
+              <label>
+                <input type="date" class="select_view" id="carryindt" th:if="${board.boardCarryoutDt} != null"
+                       th:value="${board.boardCarryinDt}">
+                <input type="date" class="select_view" id="carryindt" th:if="${board.boardCarryoutDt} == null"
+                       th:value="${board.boardCarryinDt}">
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>사용처</td>
+            <td class="ta-left">
+              <label>
+                <input type="text" placeholder="사용처" class="select_view" id="useplace"
+                       th:if="${board.boardUsePlace} != null" th:value="${board.boardUsePlace}">
+                <input type="text" placeholder="사용처" class="select_view" id="useplace"
+                       th:if="${board.boardUsePlace} == null" th:value="${board.boardUsePlace}">
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>반출여부</td>
+            <td class="ta-left">
+              <label>
+                <input type="radio" name="carry_out" value="N" id="usePlaceInside"
+                       th:checked="${board.boardUsePlace} == '본사'">내부
+                <input type="radio" name="carry_out" value="Y" th:checked="${board.boardUsePlace} != '본사'"> 외부
+              </label>
+            </td>
+          </tr>
+
+          <tr>
+            <td>등록일시</td>
+            <td class="ta-left">
+              <input type="text" class="select_view" id="useplace" th:if="${board.regdt} != null"
+                     th:value="${#temporals.format(board.regdt,'yyyy-MM-dd')}">
+              <input type="text" class="select_view" id="useplace" th:if="${board.regdt} == null" th:disabled="none">
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container ta-right">
+  <input type="button" value="목록" class="reg_button color_blue" id="boardList" onClick="location.href='/admin/boardList'">
+  <input type="button" value="등록" class="reg_button color_blue" id="createBoard" onclick="createBoard();">
+  <input type="button" value="수정" class="reg_button color_blue" id="updateBoard" onclick="updateBoard();">
+  <input type="button" value="삭제" class="reg_button color_red" id="deleteBoard" onclick="deleteBoard();">
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>
+      해당 부분 상세 내용 나와야 함
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/adminBoardReg.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

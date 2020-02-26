@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+<!----------------------------------------------------------------
+ FileName       : updatePurchaseListRegSP.html
+ Description		: 매출계산서 수금여부 등록 및 수정 화면
+ LastModifyDate	: 2020. 2. 12.
+ LastModifier	  : 강병수
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 12.    강병수    1.0    주석작성 및 파일명 변경
+     2020. 2. 10.    강병수    1.0    최초생성
+----------------------------------------------------------------->
+<head>
+  <meta charset="utf-8">
+  <title>매출관리 - 매출계산서 수금여부 등록</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+<form name="submitPayForm" id="submitPayForm">
+  <input type="hidden" id="approveNum" name="approveNum" th:value="${statis.approveNum}">
+  <div id="upload" name="upload">
+    <table>
+      <tr>
+        <td>수금여부</td>
+        <td>
+          <th:block th:if="${statis.collectionMoneyYN != null}">
+            <th:block th:if="${statis.collectionMoneyYN == 'Y'}">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="Y" th:text="수금"
+                     th:checked="checked">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="N" th:text="미수금">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="M" th:text="부분수금">
+            </th:block>
+            <th:block th:if="${statis.collectionMoneyYN == 'N'}">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="Y" th:text="수금">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="N" th:text="미수금"
+                     th:checked="checked">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="M" th:text="부분수금">
+            </th:block>
+            <th:block th:if="${statis.collectionMoneyYN == 'M'}">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="Y" th:text="수금">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="N" th:text="미수금">
+              <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="M" th:text="부분수금"
+                     th:checked="checked">
+            </th:block>
+          </th:block>
+          <th:block th:unless="${statis.collectionMoneyYN != null}">
+            <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="Y" th:text="수금">
+            <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="N" th:text="미수금"
+                   th:checked="checked">
+            <input type="radio" id="collectionMoneyYN" name="collectionMoneyYN" value="M" th:text="부분수금">
+          </th:block>
+        </td>
+      </tr>
+      <tr>
+        <td>수금일</td>
+        <td>
+          <input type="date" id="collectionMoneyDt" name="collectionMoneyDt"
+                 th:if="${statis.collectionMoneyDt == null}">
+          <input type="date" id="collectionMoneyDt" name="collectionMoneyDt"
+                 th:unless="${statis.collectionMoneyDt == null}" th:value="${statis.collectionMoneyDt}">
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="container ta-right" id="btnList">
+    <input type="button" class="reg_button color_blue" value="등록 및 수정" th:onClick="fncSubmitPay();">
+  </div>
+</form>
+<script src="js/Sales.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!----------------------------------------------------------
+ FileName		: adminServiceRegSM.html
+ Description		: 서비스 등록
+ LastModifyDate	: 2020. 2. 21.
+ LastModifier	: 류민송
+ LastVersion		: 1.0.2
+ Change History
+     2020. 2. 17.    류민송    1.0    최초생성
+     2020. 2. 18.    류민송    1.0.1  select 선택자 id 수정
+     2020. 2. 21.    류민송    1.0.2  네비게이션 수정
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 서비스 등록</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!--  <link rel="manifest" href="site.webmanifest">-->
+  <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link">상품 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+
+        <li class="nav-item">
+          <a href="#" class="nav-link"> <b>서비스 관리</b>
+            <ul>
+              <li class="nav-item"><a th:href="@{'/serviceRegForm'}" class="nav-link">코드 등록</a></li>
+              <li class="nav-item"><a th:href="@{'/serviceList'}" class="nav-link">코드 리스트</a></li>
+            </ul>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a href="#">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="both-pd">
+    <div class="container search">
+      <div class="dis-flex">
+        구분
+        <label class="mr-auto ml15">
+          <input id="cateSection" name="cateSection" type="text" placeholder="판관비, 매입">
+        </label>
+        <label>
+          <input type="button" onclick="fncCreateCateSection();" value="등록">
+        </label>
+      </div>
+
+      <div class="dis-flex mt20">
+        지급코드
+        <label class="mr-auto ml15">
+          <input id="cateCredit" name="cateCredit" type="text" placeholder="현금, 카드">
+        </label>
+        <label>
+          <input type="button" onclick="fncCreateCateCredit();" value="등록">
+        </label>
+      </div>
+
+      <div class="dis-flex mt20">
+        성격
+        <label class="mr-auto ml15">
+          <select id="inputNatureRegSectionName" class="select_view">
+            <option value="default">구분 선택</option>
+          </select>
+          <input id="inputItemRegistItemName" type="text" placeholder="인건비, 경비, 부채, 자산">
+        </label>
+        <label>
+          <input type="button" onclick="fncCreateCateNature();" value="등록">
+        </label>
+      </div>
+
+      <div class="dis-flex mt20">
+        계정과목
+        <label class="mr-auto ml15">
+          <select id="inputSubjectRegSectionName" class="select_view">
+            <option value="default">구분 선택</option>
+          </select>
+          <select id="inputSubjectRegNatureName" class="select_view">
+          </select>
+          <select id="inputSubjectRegCreditName" class="select_view">
+          </select>
+          <input id="inputModelRegistModelName" type="text" placeholder="급여, 잡급, 퇴직급여 ...">
+        </label>
+        <label>
+          <input type="button" onclick="fncCreateCateSubject();" value="등록">
+        </label>
+      </div>
+    </div>
+  </header>
+</main>
+
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+
+<script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/Service.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

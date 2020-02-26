@@ -1,0 +1,260 @@
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+<!----------------------------------------------------------------
+ FileName       : adminSalesListFM.html
+ Description		: 매출계산서 리스트 조회 화면
+ LastModifier	  : 강병수
+ LastVersion		: 1.0
+ Change History
+     2020. 2. 19.    강병수    1.0    페이징 변경
+     2020. 2. 18.    강병수    1.0    페이지이동 변경
+     2020. 2. 14.    강병수    1.0    검색조건 변경
+     2020. 2. 13.    강병수    1.0    페이징 변경
+     2020. 2. 12.    강병수    1.0    주석작성 및 파일명 변경
+     2020. 2. 10.    강병수    1.0    최초생성
+----------------------------------------------------------------->
+<head>
+  <meta charset="utf-8">
+  <title>매출관리 - 매출계산서</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="img/logo.png" alt="Archivsoft Logo">
+      <span>product manager List</span>
+    </a>
+    <div class="collapse navbar-collapse" style="flex-grow: 0;">
+      <ul class="navbar-nav">
+        <li><a th:href="@{/admin/login}">관리자 페이지 로그인</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="both-pd">
+    <form id="searchForm" name="searchForm">
+      <input type="hidden" id="pageNum" name="pageNum">
+      <div class="container search">
+        <table>
+          <tr style="border: none">
+            <td>작성일 기준</td>
+            <th:block th:if="${searchCondition.firstRegDt == null}">
+              <td><input type="date" id="firstRegDt" name="firstRegDt"> - <input type="date" id="lastRegDt"
+                                                                                 name="lastRegDt"></td>
+            </th:block>
+            <th:block th:unless="${searchCondition.firstRegDt == null}">
+              <td>
+                <input type="date" id="firstRegDt" name="firstRegDt"
+                       th:value="${#temporals.format(searchCondition.firstRegDt,'yyyy-MM-dd')}"> -
+                <input type="date" id="lastRegDt" name="lastRegDt"
+                       th:value="${#temporals.format(searchCondition.lastRegDt,'yyyy-MM-dd')}">
+              </td>
+            </th:block>
+            <td>발급일 기준</td>
+            <th:block th:if="${searchCondition.firstIssueDt == null}">
+              <td><input type="date" id="firstIssueDt" name="firstIssueDt"> - <input type="date" id="lastIssueDt"
+                                                                                     name="lastIssueDt"></td>
+            </th:block>
+            <th:block th:unless="${searchCondition.firstIssueDt == null}">
+              <td>
+                <input type="date" id="firstIssueDt" name="firstIssueDt"
+                       th:value="${#temporals.format(searchCondition.firstIssueDt,'yyyy-MM-dd')}"> -
+                <input type="date" id="lastIssueDt" name="lastIssueDt"
+                       th:value="${#temporals.format(searchCondition.lastIssueDt,'yyyy-MM-dd')}">
+              </td>
+            </th:block>
+          </tr>
+          <tr style="border: none">
+            <td>상호명</td>
+            <th:block th:if="${searchCondition.companyNM == null || searchCondition.companyNM == ''}">
+              <td><input type="text" id="companyNM" name="companyNM" placeholder="반출자 명"/></td>
+            </th:block>
+            <th:block th:unless="${searchCondition.companyNM == null || searchCondition.companyNM == ''}">
+              <td><input type="text" id="companyNM" name="companyNM" th:value="${searchCondition.companyNM}"/></td>
+            </th:block>
+            <td>수금 여부</td>
+            <td>
+              <select id="collectionMoneyYN" name="collectionMoneyYN">
+                <th:block
+                  th:if="${searchCondition.collectionMoneyYN == 'T' || searchCondition.collectionMoneyYN == null}">
+                  <option th:value="T" th:selected="selected">전체</option>
+                  <option th:value="Y">수금</option>
+                  <option th:value="N">미수금</option>
+                  <option th:value="M">부분수금</option>
+                </th:block>
+                <th:block th:if="${searchCondition.collectionMoneyYN == 'Y'}">
+                  <option th:value="T">전체</option>
+                  <option th:value="Y" th:selected="selected">수금</option>
+                  <option th:value="N">미수금</option>
+                  <option th:value="M">부분수금</option>
+                </th:block>
+                <th:block th:if="${searchCondition.collectionMoneyYN == 'N'}">
+                  <option th:value="T">전체</option>
+                  <option th:value="Y">수금</option>
+                  <option th:value="N" th:selected="selected">미수금</option>
+                  <option th:value="M">부분수금</option>
+                </th:block>
+                <th:block th:if="${searchCondition.collectionMoneyYN == 'M'}">
+                  <option th:value="T">전체</option>
+                  <option th:value="Y">수금</option>
+                  <option th:value="N">미수금</option>
+                  <option th:value="M" th:selected="selected">부분수금</option>
+                </th:block>
+              </select>
+            </td>
+          </tr>
+          <tr style="border: none">
+            <td colspan="4" align="right">
+              <button class="reg_button color_blue" th:onclick="fncSearchList();">검색</button>
+              <button class="reg_button color_red" th:onclick="fncResetSearch();">초기화</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </form>
+  </header>
+
+  <div class="container">
+    <div style="float: left">
+      <label>
+        총 : [[${priceList.get(0)}]] 건 , 합계금액 : [[${#numbers.formatInteger(priceList.get(1),3,'COMMA')}]] 원 ,
+        공급가액 : [[${#numbers.formatInteger(priceList.get(2),3,'COMMA')}]] 원 , 세액 :
+        [[${#numbers.formatInteger(priceList.get(3),3,'COMMA')}]] 원
+      </label>
+    </div>
+    <div style="float: right">
+      <button class="reg_button color_blue" th:onclick="fncExcelDown()">엑셀 다운로드</button>
+      <button class="reg_button color_blue" th:onclick="fncOpenExcelUpload()">엑셀 업로드</button>
+    </div>
+  </div>
+
+  <div class="container list-box avccd">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>작성일</td>
+            <td>발급일</td>
+            <td>승인번호</td>
+            <td>공급받는자사업자등록번호</td>
+            <td>상호</td>
+            <td>합계금액</td>
+            <td>공급가액</td>
+            <td>세액</td>
+            <td>품목명</td>
+            <td>품목비교</td>
+          </tr>
+          </thead>
+          <tbody th:if="${salesList.isEmpty()}">
+          <tr>
+            <td colspan="10">목록이 없습니다.</td>
+          </tr>
+          </tbody>
+          <tbody th:if="${salesList.getSize() != 0}">
+          <tr th:each="sales,stat : ${salesList}">
+            <td th:text="${#temporals.format(sales.regDt,'yyyy-MM-dd')}"></td>
+            <td th:text="${#temporals.format(sales.issueDt,'yyyy-MM-dd')}"></td>
+            <td><a th:onclick="fncUpdateInfo([[${sales.approveNum}]])" th:text="${sales.approveNum}"
+                   style="cursor:pointer;"></a></td>
+            <td th:text="${sales.recipientBusinessNum}"></td>
+            <td th:text="${sales.recipientCompanyNM}"></td>
+            <td th:text="${#numbers.formatInteger(sales.totalPrice,3,'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(sales.supplyPrice,3,'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(sales.taxAmount,3,'COMMA')}"></td>
+            <td th:text="${sales.itemNM}"></td>
+            <td th:text="${sales.itemNote}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container text-center">
+  <th:block th:if="${!salesList.isEmpty()}"
+            th:each="num : ${#numbers.sequence((pageNum-1)/10*10+1,(pageNum-1)/10*10+10)}">
+    <a th:if="${pageNum != 1 && num%10 == 1}" th:onclick="fncMovePage(1)" th:text="'◀'"
+       style="cursor:pointer;"></a>
+    <a th:if="${pageNum != 1 && num%10 == 1}"
+       th:onclick="fncMovePage([[${pageNum-1}]])" th:text="'◁'" style="cursor:pointer;"></a>
+    <a th:if="${pageNum != num && num <= salesList.getTotalPages()}" th:onclick="fncMovePage([[${num}]])" th:text="'['+${num}+']'"
+       style="cursor:pointer;"></a>
+    <a th:if="${pageNum == num  && num <= salesList.getTotalPages()}" th:text="'【'+${num}+'】'"></a>
+    <a th:if="${pageNum != salesList.getTotalPages()  && pageNum <= salesList.getTotalPages() && num%10 == 0}"
+       th:onclick="fncMovePage([[${pageNum+1}]])" th:text="'▷'" style="cursor:pointer;"></a>
+    <a th:if="${pageNum != salesList.getTotalPages()  && pageNum <= salesList.getTotalPages() && num%10 == 0}"
+       th:onclick="fncMovePage([[${salesList.getTotalPages()}]])" th:text="'▶'" style="cursor:pointer;"></a>
+  </th:block>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="js/Sales.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

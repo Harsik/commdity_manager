@@ -1,0 +1,169 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+<!--------------------------------------------------------------
+ FileName       : adminProductListFM.html
+ Description		: 상품 리스트 조회 화면
+ LastModifier	  : 강병수
+ LastVersion		: 1.0
+ Change History
+      2020. 2. 20.    강병수    1.0   경로 수정
+      2020. 2. 19.    강병수    1.0   페이징 변경
+      2020. 2. 18.    강병수    1.0   페이징 오류 수정
+      2020. 2. 13.    강병수    1.0   페이징 변경
+      2020. 2. 12.    강병수    1.0   주석작성 및 파일명 변경
+--------------------------------------------------------------->
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 상품 리스트</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="/img/logo.png" alt="Archivsoft Logo">
+    </a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a th:href="@{'/admin/cateList'}" class="nav-link">카테고리 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/productList'}" class="nav-link"><b>상품 관리</b></a></li>
+        <li class="nav-item"><a th:href="@{'/admin/userinfoList'}" class="nav-link">유저 관리</a></li>
+        <li class="nav-item"><a th:href="@{'/admin/boardList'}" class="nav-link">출고 관리</a></li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li><a href="@{'/user/logout'}">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container list-box">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="15%"/>
+            <col width="12.5%"/>
+            <col width="20%"/>
+            <col width="12.5%"/>
+            <col width="*"/>
+            <col width="10%"/>
+            <col width="10%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>No.</td>
+            <td>등록일시</td>
+            <td>구입연월</td>
+            <td>제품명</td>
+            <td>상태</td>
+          </tr>
+          </thead>
+          <tbody th:if="${productList.isEmpty()}">
+          <tr>
+            <td colspan="5">목록이 없습니다.</td>
+          </tr>
+          </tbody>
+          <tbody th:if="${productList.getSize() != 0}">
+          <tr th:each="product,stat : ${productList}">
+            <td th:text="${stat.count+(pageNum-1)*10}"></td>
+            <td th:text="${#temporals.format(product.regdt,'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${product.productBuyDt}"></td>
+            <td><a th:href="@{/admin/productReg(productIdx=${product.productIdx})}"
+                   th:text="${product.productItem}"></a></td>
+            <td th:if="${product.productUseYN} == 'Y'" th:text="사용중"></td>
+            <td th:unless="${product.productUseYN} == 'Y'" th:text="미사용"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container ta-right">
+  <input type="button" value="등록" class="reg_button color_blue" th:onClick="location.href='/admin/productReg'">
+</div>
+<div class="container text-center">
+  <th:block th:if="${!productList.isEmpty()}"
+            th:each="num : ${#numbers.sequence((pageNum-1)/10*10+1,(pageNum-1)/10*10+10)}">
+    <a th:if="${pageNum != 1 && num%10 == 1}" th:href="@{/admin/productList(page=1)}" th:text="'◀'"
+       style="cursor:pointer;"></a>
+    <a th:if="${pageNum != 1 && num%10 == 1}" th:href="@{/admin/productList(page=${pageNum-1})}"
+       th:text="'◁'" style="cursor:pointer;"></a>
+    <a th:if="${pageNum != num && num <= productList.getTotalPages()}" th:href="@{/admin/productList(page=${num})}"
+       th:text="'['+${num}+']'"
+       style="cursor:pointer;"></a>
+    <a th:if="${pageNum == num  && num <= productList.getTotalPages()}" th:text="'【'+${num}+'】'"></a>
+    <a th:if="${pageNum != productList.getTotalPages()  && pageNum <= productList.getTotalPages() && num%10 == 0}"
+       th:href="@{/admin/productList(page=${pageNum+1})}"
+       th:text="'▷'" style="cursor:pointer;"></a>
+    <a th:if="${pageNum != productList.getTotalPages()  && pageNum <= productList.getTotalPages() && num%10 == 0}"
+       th:href="@{/admin/productList(page=${productList.getTotalPages()})}" th:text="'▶'" style="cursor:pointer;"></a>
+  </th:block>
+</div>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>
+      해당 부분 상세 내용 나와야 함
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

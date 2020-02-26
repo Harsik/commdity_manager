@@ -1,0 +1,200 @@
+<!----------------------------------------------------------
+ FileName		: index.html
+ Description		: 게시판 리스트 및 검색
+ LastModifyDate	: 2020.02.17
+ LastModifier	: 김주찬
+ LastVersion		: 1.0
+ Change History
+     2020.02.17 김주찬 1.0 최초생성
+ 수정 내용 : 반입일 반출일 결과값 수정, Pageable 이용에 맞는 View단 페이징 처리
+---------------------------------------------------------->
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <title>대장관리 - 메인 화면</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<nav class="bg-light navbar">
+  <div class="container">
+    <a class="navber-brand">
+      <img src="img/logo.png" alt="Archivsoft Logo">
+      <span>product manager List</span>
+    </a>
+    <div class="collapse navbar-collapse" style="flex-grow: 0;">
+      <ul class="navbar-nav">
+        <li><a th:href="@{/user/login}">관리자 페이지 로그인</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="both-pd">
+    <div class="container search">
+      <form id="searchData" name="searchData" th:action="@{/}" method="post">
+        <input type="hidden" name="page" th:value="${boardList.number + 1}">
+        <label>
+          <!--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
+          품목 <input type="text" placeholder="품목 명" id="productItem" name="productItem" th:if="${productItem.isEmpty()}"/>
+          <input type="text" placeholder="품목 명" id="productItem" name="productItem" th:if="${!productItem.isEmpty()}" th:value="${productItem}"/>
+        </label>
+        <label>
+          위치 <input type="text" placeholder="해당 위치 검색" id="boardUsePlace" name="boardUsePlace" th:if="${boardUsePlace.isEmpty()}"/>
+          <input type="text" placeholder="품목 명" id="boardUsePlace" name="boardUsePlace" th:if="${!boardUsePlace.isEmpty()}" th:value="${boardUsePlace}"/>
+        </label>
+        <label>
+          사용자 <input type="text" placeholder="반출자 명" id="boardUserName" name="boardUserName" th:if="${boardUserName.isEmpty()}"/>
+          <input type="text" placeholder="품목 명" id="boardUserName" name="boardUserName" th:if="${!boardUserName.isEmpty()}" th:value="${boardUserName}"/>
+        </label>
+        <input type="button" value="검색 버튼" class="reg_button color_blue" id="Search_btn" onClick="searchBtn();">
+      </form>
+    </div>
+  </header>
+
+  <div class="container list-box avccd">
+    <div class="row">
+      <div>
+        <table>
+          <colgroup>
+            <col width="10%"/>
+            <col width="12.5%"/>
+            <col width="10%"/>
+            <col width="12.5%"/>
+            <col width="20%"/>
+            <col width="*%"/>
+            <col width="7.5%"/>
+          </colgroup>
+          <thead>
+          <tr>
+            <td>No.</td>
+            <td>등록일시</td>
+            <td>품목명</td>
+            <td>사용자</td>
+            <td>위치</td>
+            <td>반출여부</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+          <tr th:each="board : ${boardList}">
+            <td th:text="${board.boardIdx}"></td>
+            <td th:text="${board.boardCarryinDt}"></td>
+            <td th:text="${board.productEntity.getProductItem()}"></td>
+            <td th:text="${board.userinfoEntity.getUserName()}"></td>
+            <td th:text="${board.boardUsePlace}"></td>
+            <td th:text="${board.boardCarryYN}"></td>
+          </tr>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="container text-center">
+  <div>
+  <span th:if="${boardList.totalPages} > 1">
+    <ul
+      th:with="start=${T(Math).floor(boardList.number/10)*10 + 1}, last=(${start + 9 < boardList.totalPages ? start + 9 : boardList.totalPages})">
+    <li>
+      <a th:if="${productItem != '' || boardUsePlace != '' || boardUserName != '' && boardList.number+1 != 1}"
+         style="cursor:pointer" th:onclick="searchPaging([[1]]);">◀</a>
+      <a th:if="${productItem == '' && boardUsePlace == '' && boardUserName == '' && boardList.number+1 != 1}"
+         th:href="@{/(page=1)}" aria-label="First">◀</a>
+      </a>
+    </li>
+    <li>
+      <a th:if="${productItem != '' || boardUsePlace != '' || boardUserName != '' && boardList.number+1 != 1}"
+         style="cursor:pointer" th:onclick="searchPaging([[${boardList.number}]]);">◁</a>
+      <a th:if="${productItem == '' && boardUsePlace == '' && boardUserName == '' && boardList.number+1 != 1}"
+         th:href="${boardList.first} ? '#' :@{/(page=${boardList.number})}" aria-label="Previous">◁</a>
+      </a>
+    </li>
+    <li th:each="page: ${#numbers.sequence(start, last)}">
+      <a th:text="${nowPage} == ${page} ?  【 + ${page}+ 】 : [ + ${page}+ ]"
+         th:if="${productItem != '' || boardUsePlace != '' || boardUserName != ''}"
+         style="cursor:pointer" th:onclick="searchPaging([[${page}]]);"></a>
+      <a th:text="${nowPage} == ${page} ?  【 + ${page}+ 】 : [ + ${page}+ ]"
+         th:if="${productItem == '' && boardUsePlace == '' && boardUserName == ''}"
+         th:href="@{/}"></a>
+    </li>
+    <li>
+      <a th:if="${productItem != '' || boardUsePlace != '' || boardUserName != '' && boardList.number !=boardList.totalPages-1}"
+         style="cursor:pointer" th:onclick="searchPaging([[${boardList.number+2}]]);">▷</a>
+      <a th:if="${productItem == '' && boardUsePlace == '' && boardUserName == '' && boardList.number !=boardList.totalPages-1}"
+         th:href="${boardList.last} ? '#' : @{/(page=${boardList.number + 2})}" aria-label="Next">▷</a>
+      </a>
+    </li>
+    <li>
+      <a th:if="${productItem != '' || boardUsePlace != '' || boardUserName != '' && boardList.number !=boardList.totalPages-1}"
+         style="cursor:pointer" th:onclick="searchPaging([[${boardList.totalPages}]]);">▶</a>
+      <a th:if="${productItem == '' && boardUsePlace == '' && boardUserName == '' && boardList.number !=boardList.totalPages-1}"
+         th:href="@{/(page=${boardList.totalPages})}" aria-label="Last">▶</a>
+      </a>
+    </li>
+  </ul>
+  </span>
+    <span th:unless="${boardList.totalPages} > 1">
+    <a th:href="@{/(page=1)}" aria-label="First">
+        <span aria-hidden="true">1</span>
+      </a>
+  </span>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main bg-dark py-5 small">
+    <div class="container">
+      <a href="http://www.archivsoft.com/">Archivsoft</a> is a project created and maintained by Daesung
+    </div>
+  </div>
+</footer>
+
+<script src="js/vendor/modernizr-3.8.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="js/plugins.js"></script>
+<script src="js/index.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () {
+    ga.q.push(arguments)
+  };
+  ga.q = [];
+  ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto');
+  ga('set', 'transport', 'beacon');
+  ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
